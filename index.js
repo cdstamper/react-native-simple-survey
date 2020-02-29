@@ -230,7 +230,7 @@ export class SimpleSurvey extends Component {
                     this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
-                    items={survey[currentQuestionIndex].options}
+                    items={survey[currentQuestionIndex]}
                     isSelected={this.selectionHandlers[currentQuestionIndex].isSelected}
                     renderContent={renderSelector}
                     containerStyle={selectionGroupContainerStyle}
@@ -293,7 +293,7 @@ export class SimpleSurvey extends Component {
                     this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
-                    items={survey[currentQuestionIndex].options}
+                    items={survey[currentQuestionIndex]}
                     isSelected={this.selectionHandlers[currentQuestionIndex].isSelected}
                     getAllSelectedItemIndexes={this.selectionHandlers[currentQuestionIndex].getAllSelectedItemIndexes}
                     renderContent={renderSelector}
@@ -335,6 +335,7 @@ export class SimpleSurvey extends Component {
                 {this.props.renderQuestionText ?
                     this.props.renderQuestionText(questionText) : null}
                 {renderNumericInput(
+					survey[currentQuestionIndex],
                     (value) => {
                         const valInt = parseInt(value, 10);
                         if (Number.isInteger(valInt)) {
@@ -373,13 +374,14 @@ export class SimpleSurvey extends Component {
         return (<View style={containerStyle}>
             {this.props.renderQuestionText ?
                 this.props.renderQuestionText(questionText) : null}
-            {renderTextInput((value) =>
+			{renderTextInput((value) =>
+				survey[currentQuestionIndex],
                 this.updateAnswer({
                     questionId,
                     value
                 }),
                 answers[currentQuestionIndex] === undefined ? undefined : answers[currentQuestionIndex].value,
-                placeholderText,
+				placeholderText,
                 this.props.autoAdvance ? this.autoAdvance.bind(this) : null
             )}
             {this.renderNavButtons()}
