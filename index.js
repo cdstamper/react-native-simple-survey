@@ -380,9 +380,9 @@ export class SimpleSurvey extends Component {
         return (<View style={containerStyle}>
             {this.props.renderQuestionText ?
                 this.props.renderQuestionText(questionText) : null}
-			{renderTextInput((value) =>
+			{renderTextInput(
 				survey[currentQuestionIndex],
-                this.updateAnswer({
+				(value) => this.updateAnswer({
                     questionId,
                     value
                 }),
