@@ -230,7 +230,10 @@ export class SimpleSurvey extends Component {
                     this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
-                    items={survey[currentQuestionIndex]}
+					items={survey[currentQuestionIndex].options.map((option) => ({
+						...option, 
+						...survey[currentQuestionIndex]})
+					)}
                     isSelected={this.selectionHandlers[currentQuestionIndex].isSelected}
                     renderContent={renderSelector}
                     containerStyle={selectionGroupContainerStyle}
@@ -293,7 +296,10 @@ export class SimpleSurvey extends Component {
                     this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
-                    items={survey[currentQuestionIndex]}
+					items={survey[currentQuestionIndex].options.map((option) => ({
+						...option, 
+						...survey[currentQuestionIndex]})
+					)}
                     isSelected={this.selectionHandlers[currentQuestionIndex].isSelected}
                     getAllSelectedItemIndexes={this.selectionHandlers[currentQuestionIndex].getAllSelectedItemIndexes}
                     renderContent={renderSelector}
