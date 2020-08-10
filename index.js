@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
+import SelectionGroup, { SelectionHandler } from 'react-native-selection-group';
 import {
     View,
     ViewPropTypes,
 } from 'react-native';
-import PropTypes from 'prop-types';
 
-import SelectionGroup, { SelectionHandler } from 'react-native-selection-group';
+import PropTypes from 'prop-types';
 
 export class SimpleSurvey extends Component {
     static propTypes = {
@@ -227,7 +227,7 @@ export class SimpleSurvey extends Component {
         return (
             <View style={containerStyle}>
                 {this.props.renderQuestionText ?
-                    this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
+                    this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText, this.props.survey[currentQuestionIndex]) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
 					items={survey[currentQuestionIndex].options.map((option) => ({
@@ -293,7 +293,7 @@ export class SimpleSurvey extends Component {
         return (
             <View style={containerStyle}>
                 {this.props.renderQuestionText ?
-                    this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText) : null}
+                    this.props.renderQuestionText(this.props.survey[currentQuestionIndex].questionText, this.props.survey[currentQuestionIndex]) : null}
                 <SelectionGroup
                     onPress={this.selectionHandlers[currentQuestionIndex].selectionHandler}
 					items={survey[currentQuestionIndex].options.map((option) => ({
@@ -339,7 +339,7 @@ export class SimpleSurvey extends Component {
         return (
             <View style={containerStyle}>
                 {this.props.renderQuestionText ?
-                    this.props.renderQuestionText(questionText) : null}
+                    this.props.renderQuestionText(questionText, survey[currentQuestionIndex]) : null}
                 {renderNumericInput(
 					survey[currentQuestionIndex],
                     (value) => {
@@ -358,7 +358,8 @@ export class SimpleSurvey extends Component {
                     },
                     answers[currentQuestionIndex] === undefined ? '' : answers[currentQuestionIndex].value,
                     placeholderText,
-                    this.props.autoAdvance ? this.autoAdvance.bind(this) : null
+					this.props.autoAdvance ? this.autoAdvance.bind(this) : null,
+					survey[currentQuestionIndex]
                 )}
                 {this.renderNavButtons()}
             </View>
@@ -379,7 +380,7 @@ export class SimpleSurvey extends Component {
 
         return (<View style={containerStyle}>
             {this.props.renderQuestionText ?
-                this.props.renderQuestionText(questionText) : null}
+                this.props.renderQuestionText(questionText, survey[currentQuestionIndex]) : null}
 			{renderTextInput(
 				survey[currentQuestionIndex],
 				(value) => this.updateAnswer({
@@ -388,7 +389,8 @@ export class SimpleSurvey extends Component {
                 }),
                 answers[currentQuestionIndex] === undefined ? undefined : answers[currentQuestionIndex].value,
 				placeholderText,
-                this.props.autoAdvance ? this.autoAdvance.bind(this) : null
+				this.props.autoAdvance ? this.autoAdvance.bind(this) : null,
+				survey[currentQuestionIndex]
             )}
             {this.renderNavButtons()}
         </View>
@@ -402,7 +404,7 @@ export class SimpleSurvey extends Component {
         
 
         return (<View style={containerStyle}>
-            {renderInfo(questionText)}
+            {renderInfo(questionText, survey[currentQuestionIndex])}
             {this.renderNavButtons()}
         </View>
         );
