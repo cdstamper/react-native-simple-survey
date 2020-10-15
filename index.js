@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import SelectionGroup, { SelectionHandler } from 'react-native-selection-group';
 import {
+    Text,
     View,
     ViewPropTypes,
 } from 'react-native';
@@ -16,7 +17,8 @@ export class SimpleSurvey extends Component {
                 questionId: PropTypes.string,
                 options: PropTypes.arrayOf(PropTypes.shape({
                     optionText: PropTypes.string.isRequired,
-                    value: PropTypes.any.isRequired,
+					value: PropTypes.any.isRequired,
+					isExclusive: PropTypes.bool
                 }))
             }).isRequired
         ).isRequired,
@@ -192,7 +194,7 @@ export class SimpleSurvey extends Component {
 
     renderSelectionGroup() {
         const { survey, renderSelector, selectionGroupContainerStyle, containerStyle } = this.props;
-        const { currentQuestionIndex } = this.state;
+        const { currentQuestionIndex, } = this.state;
         const autoAdvanceThisQuestion = Boolean(this.props.survey[currentQuestionIndex].questionSettings && this.props.survey[currentQuestionIndex].questionSettings.autoAdvance);
         this.validateSelectionGroupSettings(this.props.survey[currentQuestionIndex].questionSettings, currentQuestionIndex);
         if (!this.selectionHandlers[currentQuestionIndex]) {
@@ -258,7 +260,7 @@ export class SimpleSurvey extends Component {
 
     renderMultipleSelectionGroup() {
         const { survey, renderSelector, selectionGroupContainerStyle, containerStyle } = this.props;
-        const { currentQuestionIndex } = this.state;
+        const { currentQuestionIndex, answers } = this.state;
         const { allowDeselect, defaultSelection, autoAdvance: autoAdvanceThisQuestion } = 
             this.props.survey[currentQuestionIndex].questionSettings;
         const multiSelectMax = Number(this.props.survey[currentQuestionIndex].questionSettings.maxMultiSelect);
@@ -305,11 +307,28 @@ export class SimpleSurvey extends Component {
                     renderContent={renderSelector}
                     containerStyle={selectionGroupContainerStyle}
                     onItemSelected={(item, allSelectedItems) => {
-                        this.updateAnswer({
-                            questionId: survey[currentQuestionIndex].questionId,
-                            value: allSelectedItems
-                        });
-                        (autoAdvanceThisQuestion || this.props.autoAdvance) && this.autoAdvance();
+						if(item.isExclusive) {
+							this.updateAnswer({
+								questionId: survey[currentQuestionIndex].questionId,
+								value: [item]
+							});
+							this.selectionHandlers[currentQuestionIndex].selectedOption = [item.value]
+						} else if (allSelectedItems.filter(i => i.isExclusive).length > 0) {
+							const nonExclusive = allSelectedItems.filter(i => !i.isExclusive)
+							const newOptions = nonExclusive.map(i => i.value)
+							console.log(newOptions)
+							this.updateAnswer({
+								questionId: survey[currentQuestionIndex].questionId,
+								value: nonExclusive
+							});
+							this.selectionHandlers[currentQuestionIndex].selectedOption = newOptions
+						} else {
+							this.updateAnswer({
+								questionId: survey[currentQuestionIndex].questionId,
+								value: allSelectedItems
+							});
+						}
+						(autoAdvanceThisQuestion || this.props.autoAdvance) && this.autoAdvance();
                     }}
                     onItemDeselected={(item, allSelectedItems) => {
                         this.updateAnswer({
