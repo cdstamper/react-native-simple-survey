@@ -14,7 +14,8 @@ export class SimpleSurvey extends Component {
             PropTypes.shape({
                 questionType: PropTypes.string.isRequired,
                 questionText: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-                questionId: PropTypes.string,
+				questionId: PropTypes.string,
+				skipIfPreviousAnswer: PropTypes.string,
                 options: PropTypes.arrayOf(PropTypes.shape({
                     optionText: PropTypes.string.isRequired,
 					value: PropTypes.any.isRequired,
@@ -109,10 +110,17 @@ export class SimpleSurvey extends Component {
 
     renderPreviousButton() {
         if (!this.props.renderPrevious) return;
-        let { currentQuestionIndex } = this.state;
+		let { currentQuestionIndex } = this.state;
+		const { survey } = this.props;
         return (
             this.props.renderPrevious(() => {
-                currentQuestionIndex--;
+				currentQuestionIndex--;
+
+				const currentQuestionSkipCondition = survey[currentQuestionIndex].skipIfPreviousAnswer
+				if (currentQuestionSkipCondition != null && currentQuestionSkipCondition != undefined && currentQuestionIndex - 1 >= 0) {
+					currentQuestionIndex--;
+					console.log('prev question skip condition exists, going further back to', currentQuestionIndex)
+				}
                 this.setState({ currentQuestionIndex });
             }, (currentQuestionIndex !== 0)
             ));
@@ -194,7 +202,7 @@ export class SimpleSurvey extends Component {
 
     renderSelectionGroup() {
         const { survey, renderSelector, selectionGroupContainerStyle, containerStyle } = this.props;
-        const { currentQuestionIndex, } = this.state;
+        const { currentQuestionIndex, answers } = this.state;
         const autoAdvanceThisQuestion = Boolean(this.props.survey[currentQuestionIndex].questionSettings && this.props.survey[currentQuestionIndex].questionSettings.autoAdvance);
         this.validateSelectionGroupSettings(this.props.survey[currentQuestionIndex].questionSettings, currentQuestionIndex);
         if (!this.selectionHandlers[currentQuestionIndex]) {
@@ -224,7 +232,22 @@ export class SimpleSurvey extends Component {
                         }), 0);
                 }
             }
-        }
+		}
+
+		const currentQuestionSkipCondition = survey[currentQuestionIndex].skipIfPreviousAnswer 
+		const prevAnswerValue = (answers[currentQuestionIndex-1].value || {}).value
+		if (currentQuestionSkipCondition != null && currentQuestionSkipCondition != undefined && currentQuestionIndex - 1 >= 0) {
+			if (prevAnswerValue == currentQuestionSkipCondition) {
+				console.log('skip condition met')
+				this.updateAnswer({
+					questionId: survey[currentQuestionIndex].questionId,
+					value: "na"
+					});
+				this.autoAdvance()
+			} else {
+				console.log('skip condition found but not met,', answers[currentQuestionIndex-1])
+			}
+		}
 
         return (
             <View style={containerStyle}>
@@ -290,7 +313,22 @@ export class SimpleSurvey extends Component {
                     }), 0);
                 }
             }
-        }
+		}
+
+		const currentQuestionSkipCondition = survey[currentQuestionIndex].skipIfPreviousAnswer 
+		const prevAnswerValue = (answers[currentQuestionIndex-1].value || {}).value
+		if (currentQuestionSkipCondition != null && currentQuestionSkipCondition != undefined && currentQuestionIndex - 1 >= 0) {
+			if (prevAnswerValue == currentQuestionSkipCondition) {
+				console.log('skip condition met')
+				this.updateAnswer({
+					questionId: survey[currentQuestionIndex].questionId,
+					value: "na"
+					});
+				this.autoAdvance()
+			} else {
+				console.log('skip condition found but not met,', answers[currentQuestionIndex-1])
+			}
+		}
 
         return (
             <View style={containerStyle}>
@@ -308,12 +346,14 @@ export class SimpleSurvey extends Component {
                     containerStyle={selectionGroupContainerStyle}
                     onItemSelected={(item, allSelectedItems) => {
 						if(item.isExclusive) {
+							console.log('is exclusive')
 							this.updateAnswer({
 								questionId: survey[currentQuestionIndex].questionId,
 								value: [item]
 							});
 							this.selectionHandlers[currentQuestionIndex].selectedOption = [item.value]
 						} else if (allSelectedItems.filter(i => i.isExclusive).length > 0) {
+							console.log('exclusive exists')
 							const nonExclusive = allSelectedItems.filter(i => !i.isExclusive)
 							const newOptions = nonExclusive.map(i => i.value)
 							console.log(newOptions)
@@ -323,6 +363,7 @@ export class SimpleSurvey extends Component {
 							});
 							this.selectionHandlers[currentQuestionIndex].selectedOption = newOptions
 						} else {
+							console.log('exclusive does not exist')
 							this.updateAnswer({
 								questionId: survey[currentQuestionIndex].questionId,
 								value: allSelectedItems
