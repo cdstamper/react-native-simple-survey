@@ -235,7 +235,7 @@ export class SimpleSurvey extends Component {
 		}
 
 		const currentQuestionSkipCondition = survey[currentQuestionIndex].skipIfPreviousAnswer 
-		const prevAnswerValue = (answers[currentQuestionIndex-1].value || {}).value
+		const prevAnswerValue = ((answers[currentQuestionIndex-1] || {}).value || {}).value
 		if (currentQuestionSkipCondition != null && currentQuestionSkipCondition != undefined && currentQuestionIndex - 1 >= 0) {
 			if (prevAnswerValue == currentQuestionSkipCondition) {
 				console.log('skip condition met')
@@ -316,7 +316,7 @@ export class SimpleSurvey extends Component {
 		}
 
 		const currentQuestionSkipCondition = survey[currentQuestionIndex].skipIfPreviousAnswer 
-		const prevAnswerValue = (answers[currentQuestionIndex-1].value || {}).value
+		const prevAnswerValue = ((answers[currentQuestionIndex-1] || {}).value || {}).value
 		if (currentQuestionSkipCondition != null && currentQuestionSkipCondition != undefined && currentQuestionIndex - 1 >= 0) {
 			if (prevAnswerValue == currentQuestionSkipCondition) {
 				console.log('skip condition met')
